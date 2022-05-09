@@ -1,59 +1,58 @@
+#Dependencies 
+
 import os
 import csv
 
-pypoll_info = os.path.join ("..", "Resources", "election_data.csv")
-results = os.path.join("..", "Analysis", "PyPoll_results.txt")
+# Load CSV
+pypoll_info = os.path.join ("Resources", "election_data.csv")
 
 # Create list for each variable that will be used for results
-vote_sum = 0
+count = 0
 candidates = []
 percent_votes = []
 num_votes = []
-winner = 0
+candidate_unique = []
 
-#total votes
-with open(pypoll_info,'r') as csv_file:
-    reader = csv.reader(csv_file, delimiter=',')
+# Set up for loop to gather info needed from CSV file
+with open(pypoll_info, newline="" ) as csv_file:
+    csvreader = csv.reader(csv_file, delimiter=',')
     
-    header = next(reader)
+    header = next(csvreader)
 
-    for row in reader:
-        vote_sum += 1
-    if row[2] not in candidates:
+    for row in csvreader:
+        count = count + 1
         candidates.append(row[2])
-        num_votes.append(1)
-    else:
-        candidate_index = candidates.index(row[2])
-        num_votes[candidate_index] +=1
-# % calculation
-for i in range(len(num_votes)):
-    percent_votes.append(num_votes[i] / vote_sum)
+    for x in set (candidates):
+        candidate_unique.append(x)
+        y = candidates.count(x)
+        num_votes.append(y)
+        z = (y/count) * 100
+        percent_votes.append(z)
+    
+    winner_count = max(num_votes)
+    winner = candidate_unique [num_votes.index(winner_count)]
 
-#winner
-for i in range(len(num_votes)):
-    if num_votes[i] > winner:
-        winner = num_votes[i]
-        winner_name = candidates [i]
+#Print results
+print("Election Results")   
+print("-------------------------")
+print("Total Votes :" + str(count))    
+print("-------------------------")
+for i in range(len(candidate_unique)):
+            print(candidate_unique[i] + ": " + str(percent_votes[i]) +"% (" + str(num_votes[i])+ ")")
+print("-------------------------")
+print("The winner is: " + winner)
 
 
-#txt file
-with open(results, 'w') as txtfile:
-    txtfile.f.write(print(f"Election Results"
-                        f"--------------------------"
-                        f"Total Votes: {str(vote_sum)}"
-                        f"--------------------------")
-                        )
-    for i in range (len(candidates)):
-        txtfile.write(print("{candidate[i]}: {percent_votes[i]}" " ({num_votes[i]}"))
-
-        txtfile.write(print("-----------------------"
-                            "Winner: {winner}"
-                            "-----------------------")
-                            )
-
-with open (results, 'r') as analysis:
-        result_values = analysis.read()
-        print(result_values)
+#txt file creation
+with open('pypoll_results.txt', 'w') as text:
+    text.write("Election Results\n")
+    text.write("---------------------------------------\n")
+    text.write("Total Vote: " + str(count) + "\n")
+    text.write("---------------------------------------\n")
+    for i in range(len(set(candidate_unique))):
+        text.write(candidate_unique[i] + ": " + str(percent_votes[i]) +"% (" + str(num_votes[i]) + ")\n")
+    text.write("---------------------------------------\n")
+    text.write("The winner is: " + winner + "\n")
 
 
 
